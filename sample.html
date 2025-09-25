@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Quiz App</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body {
+  background: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+.quiz-container {
+  background:beige;
+  padding: 30px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.option-btn {
+  margin: 5px 0;
+}
+.timer {
+  font-weight: bold;
+  text-align: right;
+}
+#feedback {
+  font-weight: bold;
+  margin-top: 10px;
+  color: green;
+}
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <div class="timer" id="timer">Time: 30s</div>
+    <div class="progress w-50">
+      <div class="progress-bar" id="progressBar" role="progressbar" style="width:0%"></div>
+    </div>
+  </div>
+  <h4 id="question">Question text</h4>
+  <div id="options" class="d-grid gap-2"></div>
+  <div id="feedback"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+// 20 quiz questions
+const quizData = [
+  {question:"At a party, you prefer to:", options:[{text:"Sit quietly in a corner", introvert:100, extrovert:0},{text:"Talk with one or two friends", introvert:50, extrovert:50},{text:"Mingle with a small group", introvert:0, extrovert:100},{text:"Lead and talk with everyone", introvert:-50, extrovert:150}]},
+  {question:"When working on a project, you like to:", options:[{text:"Work alone in silence", introvert:100, extrovert:0},{text:"Work with a trusted friend", introvert:50, extrovert:50},{text:"Discuss with a small team", introvert:0, extrovert:100},{text:"Lead a big brainstorming group", introvert:-50, extrovert:150}]},
+  {question:"How do you spend your free time?", options:[{text:"Reading or watching movies alone", introvert:100, extrovert:0},{text:"Listening to music with one friend", introvert:50, extrovert:50},{text:"Hanging out with a small group", introvert:0, extrovert:100},{text:"Going to parties or social events", introvert:-50, extrovert:150}]},
+  {question:"When making decisions, you:", options:[{text:"Reflect quietly on your own", introvert:100, extrovert:0},{text:"Think before sharing", introvert:50, extrovert:50},{text:"Ask peers for advice", introvert:0, extrovert:100},{text:"Brainstorm with a big group", introvert:-50, extrovert:150}]},
+  {question:"You feel energized when:", options:[{text:"Spending time alone", introvert:100, extrovert:0},{text:"With one close friend", introvert:50, extrovert:50},{text:"Small group gatherings", introvert:0, extrovert:100},{text:"Large social events", introvert:-50, extrovert:150}]},
+  {question:"In conversations, you:", options:[{text:"Listen more than talk", introvert:100, extrovert:0},{text:"Speak occasionally", introvert:50, extrovert:50},{text:"Share your thoughts freely", introvert:0, extrovert:100},{text:"Lead discussions actively", introvert:-50, extrovert:150}]},
+  {question:"When faced with a challenge, you:", options:[{text:"Reflect internally", introvert:100, extrovert:0},{text:"Plan quietly", introvert:50, extrovert:50},{text:"Ask friends for advice", introvert:0, extrovert:100},{text:"Brainstorm with a team", introvert:-50, extrovert:150}]},
+  {question:"Your ideal vacation is:", options:[{text:"Quiet cabin alone", introvert:100, extrovert:0},{text:"Peaceful beach with one friend", introvert:50, extrovert:50},{text:"Small group adventure", introvert:0, extrovert:100},{text:"Big party with many people", introvert:-50, extrovert:150}]},
+  {question:"At work, you prefer:", options:[{text:"Independent tasks", introvert:100, extrovert:0},{text:"Work with a trusted colleague", introvert:50, extrovert:50},{text:"Team projects", introvert:0, extrovert:100},{text:"Lead group initiatives", introvert:-50, extrovert:150}]},
+  {question:"Your communication style is:", options:[{text:"Thoughtful and reserved", introvert:100, extrovert:0},{text:"Concise and reflective", introvert:50, extrovert:50},{text:"Expressive and engaging", introvert:0, extrovert:100},{text:"Outgoing and energetic", introvert:-50, extrovert:150}]},
+  {question:"Meeting new people, you:", options:[{text:"Observe quietly first", introvert:100, extrovert:0},{text:"Approach slowly", introvert:50, extrovert:50},{text:"Engage easily", introvert:0, extrovert:100},{text:"Start chatting with everyone", introvert:-50, extrovert:150}]},
+  {question:"Your ideal weekend is:", options:[{text:"Solo hobbies", introvert:100, extrovert:0},{text:"Relaxing with a friend", introvert:50, extrovert:50},{text:"Small friend gatherings", introvert:0, extrovert:100},{text:"Big parties", introvert:-50, extrovert:150}]},
+  {question:"In group discussions, you:", options:[{text:"Listen quietly", introvert:100, extrovert:0},{text:"Contribute minimally", introvert:50, extrovert:50},{text:"Share ideas freely", introvert:0, extrovert:100},{text:"Lead conversation actively", introvert:-50, extrovert:150}]},
+  {question:"How do you recharge after a long day?", options:[{text:"Reading or meditation", introvert:100, extrovert:0},{text:"Spend time with one friend", introvert:50, extrovert:50},{text:"Attend social activity", introvert:0, extrovert:100},{text:"Go out to events", introvert:-50, extrovert:150}]},
+  {question:"Your working style is:", options:[{text:"Independent and focused", introvert:100, extrovert:0},{text:"Quiet and self-directed", introvert:50, extrovert:50},{text:"Collaborative and social", introvert:0, extrovert:100},{text:"Energetic team-oriented", introvert:-50, extrovert:150}]},
+  {question:"During free conversations, you:", options:[{text:"Speak only when necessary", introvert:100, extrovert:0},{text:"Think before speaking", introvert:50, extrovert:50},{text:"Initiate topics", introvert:0, extrovert:100},{text:"Engage actively with everyone", introvert:-50, extrovert:150}]},
+  {question:"In stressful situations, you:", options:[{text:"Withdraw and think", introvert:100, extrovert:0},{text:"Analyze quietly", introvert:50, extrovert:50},{text:"Seek social support", introvert:0, extrovert:100},{text:"Talk to group for solutions", introvert:-50, extrovert:150}]},
+  {question:"When learning something new, you:", options:[{text:"Prefer self-study", introvert:100, extrovert:0},{text:"Read and reflect alone", introvert:50, extrovert:50},{text:"Learn in small groups", introvert:0, extrovert:100},{text:"Attend classes actively", introvert:-50, extrovert:150}]},
+  {question:"Your ideal evening is:", options:[{text:"Quiet night with a book", introvert:100, extrovert:0},{text:"Listening to music alone", introvert:50, extrovert:50},{text:"Dinner with a few friends", introvert:0, extrovert:100},{text:"Going out to social events", introvert:-50, extrovert:150}]}
+];
+
+let currentQuestion = 0;
+let introvertScore = 0;
+let extrovertScore = 0;
+let timer;
+const timePerQuestion = 30;
+
+// Start timer for each question
+function startTimer(){
+  let timeLeft = timePerQuestion;
+  $('#timer').text(`Time: ${timeLeft}s`);
+  timer = setInterval(()=>{
+    timeLeft--;
+    $('#timer').text(`Time: ${timeLeft}s`);
+    if(timeLeft <= 0){
+      clearInterval(timer);
+      showNextQuestion();
+    }
+  },1000);
+}
+
+function loadQuestion(){
+  clearInterval(timer);
+  startTimer();
+  const q = quizData[currentQuestion];
+  $('#question').text(q.question);
+  $('#options').empty();
+  $('#feedback').text('');
+  q.options.forEach(opt=>{
+    const btn = $(`<button class="btn btn-outline-primary option-btn">${opt.text}</button>`);
+    btn.click(()=>{
+      clearInterval(timer);
+      introvertScore += opt.introvert;
+      extrovertScore += opt.extrovert;
+      $('#feedback').text(`You selected: ${opt.text}`);
+      setTimeout(showNextQuestion,800);
+    });
+    $('#options').append(btn);
+  });
+  $('#progressBar').css('width', `${((currentQuestion)/quizData.length)*100}%`);
+}
+
+// Show next question
+function showNextQuestion() {
+  currentQuestion++;
+  if (currentQuestion < quizData.length) loadQuestion();
+  else showResult();
+}
+
+// Show final result
+function showResult() {
+  const total = introvertScore + extrovertScore;
+  const introPercent = Math.round((introvertScore/total)*100);
+  const extroPercent = Math.round((extrovertScore/total)*100);
+  let description = "";
+  if (introPercent >= 65) description = "You are mostly introverted. You enjoy solitude, deep thinking, and meaningful one-on-one interactions.";
+  else if (extroPercent >= 65) description = "You are mostly extroverted. You thrive in social settings, enjoy meeting new people, and feel energized by group activities.";
+  else description = "You have a balanced personality. You can enjoy social activities but also appreciate your alone time.";
+
+  $('.quiz-container').html(`
+    <h3>Quiz Completed!</h3>
+    <p>Introvert: ${introPercent}%</p>
+    <p>Extrovert: ${extroPercent}%</p>
+    <hr>
+    <p><strong>Personality:</strong> ${description}</p>
+    <button id="restart" class="btn btn-success mt-3">Restart Quiz</button>
+  `);
+}
+
+// This *must be outside showResult()* to work
+$(document).on('click', '#restart', () => {
+  currentQuestion = 0;
+  introvertScore = 0;
+  extrovertScore = 0;
+  loadQuestion();
+});
+// Initialize quiz
+$(document).ready(() => {
+  loadQuestion();
+});
+</script>
+</body>
+</html>
