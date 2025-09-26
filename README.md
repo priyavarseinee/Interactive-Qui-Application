@@ -1,23 +1,34 @@
 Interactive Quiz Application
 A responsive web-based quiz that assesses personality traits (introvert vs. extrovert) through 20 multiple-choice questions. Features include timers, instant feedback, progress bars, dynamic result calculation, and a restart option.
+Project Overview
 
-Technologies Used
-
-HTML5, CSS3, Bootstrap
-
-JavaScript, jQuery
-
+A responsive, web-based personality quiz application that allows users to answer 20 multiple-choice questions and get instant feedback. The quiz calculates and displays personality results (introvert vs. extrovert) based on user responses.
 
 Features
 
-20 interactive MCQs
+20 interactive multiple-choice questions
 
-30-second timer per question
+30-second countdown timer for each question
 
-Immediate feedback and progress tracking
+Immediate feedback on answers (correct/incorrect)
 
-Final personality result calculation
+Visual progress bar showing quiz completion
 
-Restart quiz functionality
+Dynamic personality result calculation
 
-Responsive design for all devices
+Restart option to retake the quiz
+
+Responsive design for desktop, tablet, and mobile devices
+
+
+Technologies Used
+
+HTML5 – Structure of the application
+
+CSS3 & Bootstrap – Styling and responsive layout
+
+JavaScript – Quiz logic, timer, scoring, and navigation
+
+jQuery – DOM manipulation and event handling
+
+VS Code – Development environment
